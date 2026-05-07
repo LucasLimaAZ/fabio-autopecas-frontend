@@ -1,21 +1,44 @@
 <div class="login-page-container">
-  <mat-card appearance="outlined" class="login-card">
-    <mat-card-header>
-      <mat-card-title>Bem-Vindo</mat-card-title>
-      <mat-card-subtitle>Faça login</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline">
-          <mat-label>Usuário</mat-label>
-          <input formControlName="email" matInput type="text" placeholder="email@exemplo.com.br" />
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Senha</mat-label>
-          <input formControlName="password" matInput type="password" />
-        </mat-form-field>
-        <button type="submit" matButton="outlined">Acessar</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+  <div class="login-card-wrapper">
+    <mat-card appearance="outlined" class="login-card">
+      <mat-card-header>
+        <mat-card-title>Bem-Vindo</mat-card-title>
+        <mat-card-subtitle>Faça login</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline">
+            <mat-label>Usuário</mat-label>
+            <input
+              formControlName="email"
+              matInput
+              type="text"
+              placeholder="email@exemplo.com.br"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Senha</mat-label>
+            <input formControlName="password" matInput type="password" />
+          </mat-form-field>
+
+          <div class="error-message-wrapper">
+            <p>{{ errorMessage }}</p>
+          </div>
+
+          <div class="login-button-wrapper">
+            <button [disabled]="loading" type="submit" matButton="outlined">Acessar</button>
+            @if (loading) {
+              <mat-spinner [diameter]="32"></mat-spinner>
+            }
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <div>
+      <img src="/assets/imgs/fabio-autopecas.jpg" />
+    </div>
+  </div>
 </div>

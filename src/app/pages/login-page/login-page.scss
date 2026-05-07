@@ -1,7 +1,7 @@
 @use '../../variables' as *;
 
 .login-page-container {
-  background-color: $darkBlue;
+  background-color: $blue;
 
   min-height: 100vh;
   width: 100%;
@@ -11,9 +11,35 @@
   align-items: flex-start;
 }
 
-.login-card {
-  width: 35%;
+.login-card-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 90%;
   margin-top: 7%;
+
+  img {
+    height: 100%;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+}
+
+.login-button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message-wrapper {
+  p {
+    color: red;
+  }
+}
+
+mat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 mat-form-field {
@@ -23,4 +49,21 @@ mat-form-field {
 mat-card-subtitle {
   margin-top: 8px;
   margin-bottom: 32px;
+}
+
+//desktop only
+@media (min-width: 1024px) {
+  mat-card {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+//mobile only
+@media (max-width: 1024px) {
+  .login-card-wrapper {
+    img {
+      display: none;
+    }
+  }
 }

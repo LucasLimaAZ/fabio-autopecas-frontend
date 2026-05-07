@@ -6,7 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth-service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-login-page',
@@ -16,6 +19,7 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatButtonModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
@@ -24,7 +28,11 @@ export class LoginPage {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
+
+  public loading: boolean = false;
+  public errorMessage: string = '';
 
   loginForm = new FormGroup({
     email: new FormControl('', {
@@ -40,10 +48,24 @@ export class LoginPage {
   onSubmit() {
     if (this.loginForm.invalid) return;
 
+    this.loading = true;
+
     const credentials = this.loginForm.getRawValue();
-    this.authService.login(credentials).subscribe({
-      next: (response) => this.router.navigate(['']),
-      error: (err) => console.log(err),
-    });
+
+    this.authService
+      .login(credentials)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => this.router.navigate(['']),
+        error: (err) => {
+          console.log(err);
+          this.errorMessage = 'Erro ao fazer login. Verifique seu usuário e senha.';
+        },
+      });
   }
 }
