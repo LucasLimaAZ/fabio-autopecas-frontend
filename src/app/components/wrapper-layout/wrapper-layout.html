@@ -1,0 +1,9 @@
+<app-topbar (menuToggle)="toggleSidebar()" (logout)="logout()" />
+
+<div class="layout-body">
+  <app-sidebar [open]="sidebarOpen" />
+
+  <main class="page-content">
+    <router-outlet />
+  </main>
+</div>

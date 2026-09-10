@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginPage } from './pages/login-page/login-page';
 import { HomePage } from './pages/home-page/home-page';
 import { authGuard } from './core/guards/auth-guard';
+import { WrapperLayout } from './components/wrapper-layout/wrapper-layout';
 
 export const routes: Routes = [
   {
@@ -10,7 +11,13 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: HomePage,
+    component: WrapperLayout,
     canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        component: HomePage,
+      },
+    ],
   },
 ];

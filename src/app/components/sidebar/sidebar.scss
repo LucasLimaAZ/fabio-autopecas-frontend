@@ -1,0 +1,23 @@
+.sidebar {
+  background: #172554;
+  color: #ffffff;
+  min-height: calc(100vh - 4rem);
+  overflow: hidden;
+  padding: 1.5rem 1rem;
+  transition:
+    width 160ms ease,
+    padding 160ms ease;
+  width: 15rem;
+}
+
+.sidebar--closed {
+  padding-left: 0;
+  padding-right: 0;
+  width: 0;
+}
+
+a {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
