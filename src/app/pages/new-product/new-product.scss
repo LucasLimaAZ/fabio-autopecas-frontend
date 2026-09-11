@@ -1,0 +1,50 @@
+.new-product-page {
+  margin: 0 auto;
+  max-width: 60rem;
+}
+
+mat-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+mat-spinner {
+  display: inline-block;
+}
+
+.message {
+  margin: 0.5rem 0;
+}
+
+.message--error {
+  color: #b3261e;
+}
+
+.message--success {
+  color: #176b3a;
+}
+
+@media (max-width: forty) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+}
