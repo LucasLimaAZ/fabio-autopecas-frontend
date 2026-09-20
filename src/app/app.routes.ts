@@ -5,6 +5,7 @@ import { authGuard } from './core/guards/auth-guard';
 import { WrapperLayout } from './components/wrapper-layout/wrapper-layout';
 import { NewProduct } from './pages/new-product/new-product';
 import { Products } from './pages/products/products';
+import { Categories } from './pages/categories/categories';
 
 export const routes: Routes = [
   {
@@ -27,6 +28,10 @@ export const routes: Routes = [
       {
         path: 'products',
         component: Products,
+      },
+      {
+        path: 'categories',
+        component: Categories,
       },
     ],
   },
