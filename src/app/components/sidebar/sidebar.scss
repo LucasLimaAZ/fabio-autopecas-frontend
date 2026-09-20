@@ -3,11 +3,17 @@
   color: #ffffff;
   min-height: calc(100vh - 4rem);
   overflow: hidden;
-  padding: 1.5rem 1rem;
+  padding: 1.75rem 0.75rem;
   transition:
     width 160ms ease,
     padding 160ms ease;
   width: 15rem;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
 .sidebar--closed {
@@ -17,7 +23,34 @@
 }
 
 a {
+  align-items: center;
+  border-left: 3px solid transparent;
+  border-radius: 0 0.45rem 0.45rem 0;
   color: inherit;
-  display: block;
+  display: flex;
+  gap: 0.8rem;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
   text-decoration: none;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+a:hover,
+a:focus-visible {
+  background: #263b73;
+  border-left-color: #eed324;
+  color: #ffffff;
+  outline: none;
+}
+
+mat-icon {
+  color: #eed324;
+  flex: 0 0 auto;
+}
+
+a span {
+  white-space: nowrap;
 }

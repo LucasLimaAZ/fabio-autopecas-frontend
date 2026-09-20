@@ -1,8 +1,20 @@
 <aside class="sidebar" [class.sidebar--closed]="!open()">
   <nav aria-label="Navegação principal">
-    <a href="/">Início</a>
-    <a href="/products">Produtos</a>
-    <a href="/categories">Categorias</a>
-    <a href="/products/new">Novo produto</a>
+    <a href="/">
+      <mat-icon aria-hidden="true">home</mat-icon>
+      <span>Início</span>
+    </a>
+    <a href="/products">
+      <mat-icon aria-hidden="true">inventory_2</mat-icon>
+      <span>Produtos</span>
+    </a>
+    <a href="/categories">
+      <mat-icon aria-hidden="true">category</mat-icon>
+      <span>Categorias</span>
+    </a>
+    <a href="/products/new">
+      <mat-icon aria-hidden="true">add_box</mat-icon>
+      <span>Novo produto</span>
+    </a>
   </nav>
 </aside>
