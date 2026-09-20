@@ -4,6 +4,7 @@ import { HomePage } from './pages/home-page/home-page';
 import { authGuard } from './core/guards/auth-guard';
 import { WrapperLayout } from './components/wrapper-layout/wrapper-layout';
 import { NewProduct } from './pages/new-product/new-product';
+import { Products } from './pages/products/products';
 
 export const routes: Routes = [
   {
@@ -22,6 +23,10 @@ export const routes: Routes = [
       {
         path: 'products/new',
         component: NewProduct,
+      },
+      {
+        path: 'products',
+        component: Products,
       },
     ],
   },

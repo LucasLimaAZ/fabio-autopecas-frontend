@@ -1,0 +1,102 @@
+<section class="products-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Estoque</p>
+      <h2>Produtos</h2>
+      <p class="page-description">Consulte os produtos cadastrados no estoque.</p>
+    </div>
+    <button matButton="filled" type="button" (click)="goToNewProduct()">Novo produto</button>
+  </div>
+
+  <div class="search-form">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar produto</mat-label>
+      <input
+        matInput
+        [formControl]="searchControl"
+        placeholder="Nome ou referência"
+        type="search"
+      />
+    </mat-form-field>
+    @if (activeSearch) {
+      <button matButton="outlined" type="button" [disabled]="loading" (click)="clearSearch()">
+        Limpar
+      </button>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="state state--loading" aria-label="Carregando produtos">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <mat-card appearance="outlined" class="state">
+      <p class="message message--error" role="alert">{{ errorMessage }}</p>
+      <button matButton="outlined" type="button" (click)="loadProducts()">Tentar novamente</button>
+    </mat-card>
+  } @else if (products.length === 0) {
+    <mat-card appearance="outlined" class="state">
+      <h3>Nenhum produto cadastrado</h3>
+      <p>Adicione o primeiro produto para começar a controlar o estoque.</p>
+      <button matButton="filled" type="button" (click)="goToNewProduct()">Cadastrar produto</button>
+    </mat-card>
+  } @else {
+    <mat-card appearance="outlined" class="table-card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Produto</th>
+              <th scope="col">Referência</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Estoque</th>
+              <th scope="col">Preço de custo</th>
+              <th scope="col">Preço de venda</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products; track trackByProductId($index, product)) {
+              <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.ref }}</td>
+                <td>{{ product.category_id }}</td>
+                <td>
+                  <span [class.stock--low]="product.amount <= product.minimum_amount">
+                    {{ product.amount }}
+                  </span>
+                </td>
+                <td>
+                  {{ product.cost_price === null ? '-' : (product.cost_price | currency: 'BRL') }}
+                </td>
+                <td>
+                  {{ product.sale_price === null ? '-' : (product.sale_price | currency: 'BRL') }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer class="pagination" aria-label="Paginação de produtos">
+        <span>{{ totalProducts }} produto(s) | Página {{ currentPage }} de {{ totalPages }}</span>
+        <div class="pagination-actions">
+          <button
+            matButton="outlined"
+            type="button"
+            [disabled]="loading || currentPage === 1"
+            (click)="previousPage()"
+          >
+            Anterior
+          </button>
+          <button
+            matButton="outlined"
+            type="button"
+            [disabled]="loading || currentPage >= totalPages"
+            (click)="nextPage()"
+          >
+            Próxima
+          </button>
+        </div>
+      </footer>
+    </mat-card>
+  }
+</section>

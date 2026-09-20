@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 
@@ -16,6 +16,18 @@ export interface CreateProductPayload {
 
 export interface Product extends CreateProductPayload {
   id: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductPage {
+  products: Product[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 @Injectable({
@@ -28,5 +40,17 @@ export class ProductService {
 
   createProduct(product: CreateProductPayload): Observable<Product> {
     return this.http.post<Product>(this.endpoint, product);
+  }
+
+  getProducts(page = 1, limit = 10): Observable<ProductPage> {
+    const params = new HttpParams().set('page', page).set('limit', limit);
+
+    return this.http.get<ProductPage>(this.endpoint, { params });
+  }
+
+  searchProducts(term: string): Observable<Product[]> {
+    const params = new HttpParams().set('term', term);
+
+    return this.http.get<Product[]>(`${this.endpoint}/search`, { params });
   }
 }

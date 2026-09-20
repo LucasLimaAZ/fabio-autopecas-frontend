@@ -26,6 +26,8 @@ describe('NewProduct', () => {
         amount: 0,
         minimum_amount: 0,
         category_id: 1,
+        createdAt: '2026-09-20T15:16:07.000Z',
+        updatedAt: '2026-09-20T15:16:07.000Z',
       }),
     );
 
