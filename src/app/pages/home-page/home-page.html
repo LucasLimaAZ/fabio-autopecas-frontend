@@ -1,1 +1,54 @@
-<p>home-page works!</p>
+<section class="home-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Dashboard</p>
+      <h2>Resumo geral</h2>
+      <p class="page-description">Acompanhe o desempenho do negócio em um só lugar.</p>
+    </div>
+  </header>
+
+  @if (loading) {
+    <div class="state state--loading" aria-label="Carregando estatísticas">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <mat-card appearance="outlined" class="state">
+      <p class="message message--error" role="alert">{{ errorMessage }}</p>
+      <button matButton="outlined" type="button" (click)="loadStats()">Tentar novamente</button>
+    </mat-card>
+  } @else {
+    <div class="stats-grid">
+      <mat-card appearance="outlined" class="stat-card stat-card--products">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Produtos</span>
+          <mat-icon aria-hidden="true">inventory_2</mat-icon>
+        </div>
+        <strong class="stat-card__value">{{ stats.totalProducts }}</strong>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="stat-card stat-card--users">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Usuários</span>
+          <mat-icon aria-hidden="true">people</mat-icon>
+        </div>
+        <strong class="stat-card__value">{{ stats.totalUsers }}</strong>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="stat-card stat-card--sales">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Vendas</span>
+          <mat-icon aria-hidden="true">sell</mat-icon>
+        </div>
+        <strong class="stat-card__value">{{ stats.totalSales }}</strong>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="stat-card stat-card--low-stock">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Estoque baixo</span>
+          <mat-icon aria-hidden="true">warning</mat-icon>
+        </div>
+        <strong class="stat-card__value">{{ stats.lowStockProducts }}</strong>
+      </mat-card>
+    </div>
+  }
+</section>

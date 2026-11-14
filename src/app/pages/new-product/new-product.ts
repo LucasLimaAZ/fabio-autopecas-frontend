@@ -5,8 +5,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
+import { Category, CategoryService } from '../../shared/services/category-service';
 import { CreateProductPayload, ProductService } from '../../shared/services/product-service';
 
 @Component({
@@ -17,6 +19,7 @@ import { CreateProductPayload, ProductService } from '../../shared/services/prod
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     ReactiveFormsModule,
   ],
   templateUrl: './new-product.html',
@@ -47,15 +50,19 @@ export class NewProduct implements OnInit {
   successMessage = '';
   isEditMode = false;
   productId: number | null = null;
+  categories: Category[] = [];
 
   constructor(
     private readonly productService: ProductService,
+    private readonly categoryService: CategoryService,
     private readonly cdr: ChangeDetectorRef,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
   ) {}
 
   ngOnInit() {
+    this.loadCategories();
+
     this.route.paramMap.subscribe((params) => {
       const id = Number(params.get('id'));
 
@@ -128,6 +135,21 @@ export class NewProduct implements OnInit {
           }
 
           this.errorMessage = 'Não foi possível cadastrar o produto. Tente novamente.';
+        },
+      });
+  }
+
+  private loadCategories() {
+    this.categoryService
+      .getCategories()
+      .pipe(finalize(() => this.cdr.detectChanges()))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+        },
+        error: () => {
+          this.categories = [];
+          this.errorMessage = 'Não foi possível carregar as categorias.';
         },
       });
   }

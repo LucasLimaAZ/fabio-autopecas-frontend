@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
+import { CategoryService } from '../../shared/services/category-service';
 import { ProductService } from '../../shared/services/product-service';
 import { NewProduct } from './new-product';
 
@@ -13,12 +14,23 @@ describe('NewProduct', () => {
     'getProductById',
     'updateProduct',
   ]);
+  const categoryService = jasmine.createSpyObj<CategoryService>('CategoryService', [
+    'getCategories',
+  ]);
 
   beforeEach(async () => {
+    categoryService.getCategories.and.returnValue(
+      of([
+        { id: 1, name: 'Filtros' },
+        { id: 2, name: 'Pastilhas' },
+      ]),
+    );
+
     await TestBed.configureTestingModule({
       imports: [NewProduct],
       providers: [
         { provide: ProductService, useValue: productService },
+        { provide: CategoryService, useValue: categoryService },
         provideRouter([]),
         { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } },
       ],

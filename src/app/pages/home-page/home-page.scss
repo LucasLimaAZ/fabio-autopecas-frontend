@@ -1,0 +1,126 @@
+.home-page {
+  margin: 0 auto;
+  max-width: 78rem;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+}
+
+h2,
+p {
+  margin-top: 0;
+}
+
+h2 {
+  color: #172554;
+  font-size: 2rem;
+  margin-bottom: 0.35rem;
+}
+
+.page-description {
+  color: #64748b;
+  margin-bottom: 0;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card {
+  padding: 1.25rem;
+}
+
+.stat-card__header {
+  align-items: center;
+  color: #475569;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-card__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-card__value {
+  color: #172554;
+  display: block;
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.stat-card mat-icon {
+  align-items: center;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  font-size: 1.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.stat-card--products mat-icon {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.stat-card--users mat-icon {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.stat-card--sales mat-icon {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.stat-card--low-stock mat-icon {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.state {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  min-height: 12rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.state--loading {
+  display: flex;
+}
+
+.message--error {
+  color: #b3261e;
+  margin-bottom: 0;
+}
+
+@media (max-width: 64rem) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

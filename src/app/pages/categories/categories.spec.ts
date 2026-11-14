@@ -14,6 +14,10 @@ describe('Categories', () => {
   ]);
 
   beforeEach(async () => {
+    categoryService.getCategories.calls.reset();
+    categoryService.createCategory.calls.reset();
+    categoryService.deleteCategory.calls.reset();
+
     categoryService.getCategories.and.returnValue(of([]));
     categoryService.createCategory.and.returnValue(of({ id: 1, name: 'Filtros' }));
     categoryService.deleteCategory.and.returnValue(of(undefined));
