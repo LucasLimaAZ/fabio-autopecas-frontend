@@ -52,6 +52,7 @@
               <th scope="col">Estoque</th>
               <th scope="col">Preço de custo</th>
               <th scope="col">Preço de venda</th>
+              <th scope="col" class="actions-header">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -70,6 +71,19 @@
                 </td>
                 <td>
                   {{ product.sale_price === null ? '-' : (product.sale_price | currency: 'BRL') }}
+                </td>
+                <td class="action-cell">
+                  <button matButton="outlined" type="button" (click)="goToEditProduct(product)">
+                    Editar
+                  </button>
+                  <button
+                    matButton="outlined"
+                    color="warn"
+                    type="button"
+                    (click)="deleteProduct(product)"
+                  >
+                    Excluir
+                  </button>
                 </td>
               </tr>
             }

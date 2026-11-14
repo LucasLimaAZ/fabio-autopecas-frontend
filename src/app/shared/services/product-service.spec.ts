@@ -90,4 +90,39 @@ describe('ProductService', () => {
     expect(request.request.method).toBe('GET');
     request.flush(response);
   });
+
+  it('should update a product with PATCH /product/:id', () => {
+    const updatedProduct: Product = {
+      id: 5,
+      name: 'Produto editado',
+      ref: 'REF-005',
+      notes: 'Atualizado',
+      cost_price: 30,
+      sale_price: 60,
+      amount: 20,
+      minimum_amount: 5,
+      category_id: 2,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-02T00:00:00.000Z',
+    };
+
+    service.updateProduct(5, updatedProduct).subscribe((result) => {
+      expect(result).toEqual(updatedProduct);
+    });
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/product/5`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual(updatedProduct);
+    request.flush(updatedProduct);
+  });
+
+  it('should delete a product with DELETE /product/:id', () => {
+    service.deleteProduct(8).subscribe((result) => {
+      expect(result).toBeNull();
+    });
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/product/8`);
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null);
+  });
 });

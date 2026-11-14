@@ -71,6 +71,16 @@ h2 {
   gap: 0.5rem;
 }
 
+.actions-header {
+  width: 11rem;
+}
+
+.action-cell {
+  display: flex;
+  gap: 0.5rem;
+  min-width: 11rem;
+}
+
 table {
   border-collapse: collapse;
   min-width: 50rem;

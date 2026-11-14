@@ -42,6 +42,10 @@ export class ProductService {
     return this.http.post<Product>(this.endpoint, product);
   }
 
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.endpoint}/${id}`);
+  }
+
   getProducts(page = 1, limit = 10): Observable<ProductPage> {
     const params = new HttpParams().set('page', page).set('limit', limit);
 
@@ -52,5 +56,13 @@ export class ProductService {
     const params = new HttpParams().set('term', term);
 
     return this.http.get<Product[]>(`${this.endpoint}/search`, { params });
+  }
+
+  updateProduct(id: number, product: CreateProductPayload): Observable<Product> {
+    return this.http.patch<Product>(`${this.endpoint}/${id}`, product);
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.endpoint}/${id}`);
   }
 }

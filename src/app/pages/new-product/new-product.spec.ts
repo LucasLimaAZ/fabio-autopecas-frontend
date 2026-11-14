@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { ProductService } from '../../shared/services/product-service';
@@ -7,12 +8,20 @@ import { NewProduct } from './new-product';
 describe('NewProduct', () => {
   let component: NewProduct;
   let fixture: ComponentFixture<NewProduct>;
-  const productService = jasmine.createSpyObj<ProductService>('ProductService', ['createProduct']);
+  const productService = jasmine.createSpyObj<ProductService>('ProductService', [
+    'createProduct',
+    'getProductById',
+    'updateProduct',
+  ]);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NewProduct],
-      providers: [{ provide: ProductService, useValue: productService }],
+      providers: [
+        { provide: ProductService, useValue: productService },
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } },
+      ],
     }).compileComponents();
 
     productService.createProduct.and.returnValue(

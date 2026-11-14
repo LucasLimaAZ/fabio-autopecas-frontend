@@ -106,6 +106,36 @@ export class Products implements OnInit {
     this.router.navigate(['/products/new']);
   }
 
+  goToEditProduct(product: Product) {
+    this.router.navigate(['/products', product.id, 'edit']);
+  }
+
+  deleteProduct(product: Product) {
+    const confirmed = window.confirm(`Deseja realmente excluir o produto "${product.name}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.productService
+      .deleteProduct(product.id)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => this.loadProducts(this.currentPage),
+        error: () => {
+          this.errorMessage = 'Não foi possível excluir o produto. Tente novamente.';
+        },
+      });
+  }
+
   clearSearch() {
     this.searchControl.setValue('');
   }

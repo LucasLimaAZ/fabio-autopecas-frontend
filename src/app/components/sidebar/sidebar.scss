@@ -1,7 +1,9 @@
 .sidebar {
   background: #172554;
   color: #ffffff;
-  min-height: calc(100vh - 4rem);
+  flex: 0 0 15rem;
+  height: auto;
+  min-height: 100%;
   overflow: hidden;
   padding: 1.75rem 0.75rem;
   transition:
