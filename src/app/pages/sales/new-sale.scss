@@ -1,0 +1,102 @@
+.new-sale-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.new-sale-card {
+  width: min(100%, 1000px);
+}
+
+.sale-form {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.add-item {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) 180px auto;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.product-field {
+  width: 100%;
+}
+
+.notes-field {
+  min-width: 0;
+}
+
+.items-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.items-table th,
+.items-table td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.items-table input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.sale-summary {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  font-size: 1.125rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.message {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+
+.message--error {
+  background: #fdecea;
+  color: #b3261e;
+}
+
+.message--success {
+  background: #e6f4ea;
+  color: #1b5e20;
+}
+
+.empty-state {
+  padding: 1rem;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  color: rgba(0, 0, 0, 0.7);
+  margin-bottom: 1.5rem;
+}

@@ -6,6 +6,7 @@ import { WrapperLayout } from './components/wrapper-layout/wrapper-layout';
 import { NewProduct } from './pages/new-product/new-product';
 import { Products } from './pages/products/products';
 import { Categories } from './pages/categories/categories';
+import { NewSale } from './pages/sales/new-sale';
 
 export const routes: Routes = [
   {
@@ -36,6 +37,10 @@ export const routes: Routes = [
       {
         path: 'categories',
         component: Categories,
+      },
+      {
+        path: 'sales/new',
+        component: NewSale,
       },
     ],
   },
