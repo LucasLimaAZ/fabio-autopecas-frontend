@@ -113,14 +113,167 @@ h2 {
   margin-bottom: 0;
 }
 
+.dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.dashboard-panel {
+  padding: 1.25rem;
+}
+
+.panel-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-header h3,
+.panel-eyebrow {
+  margin: 0;
+}
+
+.panel-header h3 {
+  color: #172554;
+}
+
+.panel-eyebrow {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.panel-header mat-icon {
+  color: #64748b;
+}
+
+.low-stock-list,
+.sales-chart {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.low-stock-item {
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.low-stock-item__identity {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.low-stock-item__identity span,
+.stock-values span {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.stock-values {
+  display: flex;
+  gap: 0.75rem;
+  text-align: right;
+}
+
+.stock-values span {
+  display: grid;
+}
+
+.stock-values strong {
+  color: #b91c1c;
+  font-size: 1rem;
+}
+
+.chart-row {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.chart-row__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.chart-row__header span {
+  color: #64748b;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.chart-track {
+  background: #eff6ff;
+  border-radius: 999px;
+  height: 0.65rem;
+  overflow: hidden;
+}
+
+.chart-bar {
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+  border-radius: 999px;
+  height: 100%;
+  min-width: 4%;
+  transition: width 300ms ease;
+}
+
+.stat-card__period {
+  color: #172554;
+  font-size: 1.35rem;
+}
+
+.stat-card--top mat-icon {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.stat-card--period mat-icon {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.empty-message {
+  color: #64748b;
+  margin: 2rem 0;
+  text-align: center;
+}
+
 @media (max-width: 64rem) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 40rem) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .low-stock-item,
+  .chart-row__header {
+    align-items: flex-start;
+  }
+
+  .low-stock-item,
+  .chart-row__header {
+    flex-direction: column;
+  }
+
+  .stock-values {
+    text-align: left;
   }
 }

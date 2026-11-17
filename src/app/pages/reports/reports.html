@@ -10,7 +10,7 @@
   </div>
 
   <mat-card appearance="outlined" class="filters-card">
-    <form class="report-form" [formGroup]="reportForm" (ngSubmit)="submit()">
+    <form [formGroup]="reportForm" (ngSubmit)="submit()">
       <div class="field-group">
         <label for="reportType">Tipo de relatório</label>
         <mat-form-field appearance="outline">
@@ -22,40 +22,34 @@
         </mat-form-field>
       </div>
 
-      @if (selectedReportType === 'top-products') {
+      <div class="flex">
         <div class="field-group">
-          <label for="period">Período de referência</label>
+          <label for="startDate">Data inicial</label>
           <mat-form-field appearance="outline">
-            <mat-select id="period" formControlName="period">
-              @for (option of periodOptions; track option.value) {
-                <mat-option [value]="option.value">{{ option.label }}</mat-option>
-              }
-            </mat-select>
+            <input
+              matInput
+              id="startDate"
+              [matDatepicker]="startDatePicker"
+              formControlName="startDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker" />
+            <mat-datepicker #startDatePicker />
           </mat-form-field>
         </div>
-      }
 
-      <div class="field-group">
-        <label for="startDate">Data inicial</label>
-        <mat-form-field appearance="outline">
-          <input
-            matInput
-            id="startDate"
-            [matDatepicker]="startDatePicker"
-            formControlName="startDate"
-          />
-          <mat-datepicker-toggle matSuffix [for]="startDatePicker" />
-          <mat-datepicker #startDatePicker />
-        </mat-form-field>
-      </div>
-
-      <div class="field-group">
-        <label for="endDate">Data final</label>
-        <mat-form-field appearance="outline">
-          <input matInput id="endDate" [matDatepicker]="endDatePicker" formControlName="endDate" />
-          <mat-datepicker-toggle matSuffix [for]="endDatePicker" />
-          <mat-datepicker #endDatePicker />
-        </mat-form-field>
+        <div class="field-group">
+          <label for="endDate">Data final</label>
+          <mat-form-field appearance="outline">
+            <input
+              matInput
+              id="endDate"
+              [matDatepicker]="endDatePicker"
+              formControlName="endDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker" />
+            <mat-datepicker #endDatePicker />
+          </mat-form-field>
+        </div>
       </div>
 
       <div class="actions">
@@ -109,28 +103,85 @@
         <mat-card appearance="outlined" class="table-card">
           <div class="table-wrapper">
             <table>
-              <thead>
-                <tr>
-                  <th scope="col">Produto</th>
-                  <th scope="col">Referência</th>
-                  <th scope="col">Quantidade</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Preço médio</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (item of getProductRows(); track item.product_id) {
+              @if (selectedReportType === 'products-sold') {
+                <thead>
                   <tr>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.ref }}</td>
-                    <td>{{ item.total_quantity }}</td>
-                    <td>{{ formatCurrency(item.total_amount) }}</td>
-                    <td>{{ formatCurrency(item.average_unit_price ?? 0) }}</td>
+                    <th scope="col">Venda</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Referência</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Preço unitário</th>
+                    <th scope="col">Subtotal</th>
                   </tr>
-                }
-              </tbody>
+                </thead>
+                <tbody>
+                  @for (item of getProductRows(); track $index) {
+                    @if ('sale_id' in item) {
+                      <tr>
+                        <td>#{{ item.sale_id }}</td>
+                        <td>{{ item.sale_date | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.ref ?? '-' }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ formatCurrency(item.unit_price) }}</td>
+                        <td>{{ formatCurrency(item.subtotal) }}</td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              } @else {
+                <thead>
+                  <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Referência</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Preço médio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of getProductRows(); track item.product_id) {
+                    @if ('total_quantity' in item) {
+                      <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.ref }}</td>
+                        <td>{{ item.total_quantity }}</td>
+                        <td>{{ formatCurrency(item.total_amount) }}</td>
+                        <td>{{ formatCurrency(item.average_unit_price ?? 0) }}</td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              }
             </table>
           </div>
+
+          @if (selectedReportType === 'products-sold') {
+            <footer class="pagination" aria-label="Paginação do relatório">
+              <span
+                >{{ totalItems }} item(ns) | Página {{ currentPage }} de {{ totalPages || 1 }}</span
+              >
+              <div class="pagination-actions">
+                <button
+                  matButton="outlined"
+                  type="button"
+                  [disabled]="loading || currentPage === 1"
+                  (click)="previousPage()"
+                >
+                  Anterior
+                </button>
+                <button
+                  matButton="outlined"
+                  type="button"
+                  [disabled]="loading || currentPage >= totalPages"
+                  (click)="nextPage()"
+                >
+                  Próxima
+                </button>
+              </div>
+            </footer>
+          }
         </mat-card>
       }
 

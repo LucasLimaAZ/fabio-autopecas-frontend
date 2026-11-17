@@ -110,8 +110,8 @@ export class Products implements OnInit {
     this.router.navigate(['/products', product.id, 'edit']);
   }
 
-  deleteProduct(product: Product) {
-    const confirmed = window.confirm(`Deseja realmente excluir o produto "${product.name}"?`);
+  archiveProduct(product: Product) {
+    const confirmed = window.confirm(`Deseja arquivar o produto "${product.name}"?`);
 
     if (!confirmed) {
       return;
@@ -121,7 +121,7 @@ export class Products implements OnInit {
     this.errorMessage = '';
 
     this.productService
-      .deleteProduct(product.id)
+      .archiveProduct(product.id)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -129,9 +129,12 @@ export class Products implements OnInit {
         }),
       )
       .subscribe({
-        next: () => this.loadProducts(this.currentPage),
+        next: () => {
+          this.products = this.products.filter((item) => item.id !== product.id);
+          this.loadProducts(this.currentPage);
+        },
         error: () => {
-          this.errorMessage = 'Não foi possível excluir o produto. Tente novamente.';
+          this.errorMessage = 'Não foi possível arquivar o produto. Tente novamente.';
         },
       });
   }
@@ -147,7 +150,7 @@ export class Products implements OnInit {
 
     return this.productService.searchProducts(this.activeSearch).pipe(
       map((products) => ({
-        products,
+        products: products.filter((product) => product.status !== 'archived'),
         pagination: {
           page: 1,
           limit: products.length,
@@ -159,7 +162,7 @@ export class Products implements OnInit {
   }
 
   private updateProducts(response: ProductPage) {
-    this.products = response.products;
+    this.products = response.products.filter((product) => product.status !== 'archived');
     this.currentPage = response.pagination.page;
     this.totalProducts = response.pagination.total;
     this.totalPages = response.pagination.totalPages;

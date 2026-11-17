@@ -31,26 +31,31 @@ describe('ReportService', () => {
       startDate: '2026-11-01',
       endDate: '2026-11-30',
       totalSales: 18,
-      totalProducts: 6,
+      totalItems: 42,
+      page: 1,
+      limit: 20,
+      totalPages: 3,
       items: [
         {
+          sale_id: 5,
+          sale_date: '2026-11-20',
           product_id: 10,
           product_name: 'Filtro de Óleo',
           ref: 'FLT-001',
           category_id: 2,
-          total_quantity: 12,
-          total_amount: '479.60',
-          average_unit_price: '39.97',
+          quantity: 2,
+          unit_price: '39.90',
+          subtotal: '79.80',
         },
       ],
     };
 
-    service.getProductsSoldReport('2026-11-01', '2026-11-30').subscribe((result) => {
+    service.getProductsSoldReport('2026-11-01', '2026-11-30', 1, 20).subscribe((result) => {
       expect(result).toEqual(response);
     });
 
     const request = httpTesting.expectOne(
-      `${environment.apiUrl}/sale/report/products?startDate=2026-11-01&endDate=2026-11-30`,
+      `${environment.apiUrl}/sale/report/products?startDate=2026-11-01&endDate=2026-11-30&page=1&limit=20`,
     );
     expect(request.request.method).toBe('GET');
     request.flush(response);
@@ -58,7 +63,6 @@ describe('ReportService', () => {
 
   it('should request the top products report', () => {
     const response = {
-      period: 'month' as const,
       startDate: '2026-11-01',
       endDate: '2026-11-30',
       limit: 10,
@@ -77,12 +81,12 @@ describe('ReportService', () => {
       ],
     };
 
-    service.getTopProductsReport('month', '2026-11-01', '2026-11-30', 10).subscribe((result) => {
+    service.getTopProductsReport('2026-11-01', '2026-11-30', 10).subscribe((result) => {
       expect(result).toEqual(response);
     });
 
     const request = httpTesting.expectOne(
-      `${environment.apiUrl}/sale/report/top-products?period=month&startDate=2026-11-01&endDate=2026-11-30&limit=10`,
+      `${environment.apiUrl}/sale/report/top-products?startDate=2026-11-01&endDate=2026-11-30&limit=10`,
     );
     expect(request.request.method).toBe('GET');
     request.flush(response);

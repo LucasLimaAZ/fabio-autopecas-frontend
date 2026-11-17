@@ -3,8 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 
-export type ReportPeriod = 'week' | 'month' | 'year';
-
 export interface ProductSalesSummary {
   product_id: number;
   product_name: string;
@@ -15,16 +13,30 @@ export interface ProductSalesSummary {
   average_unit_price?: string | number;
 }
 
+export interface SoldProductItem {
+  sale_id: number;
+  sale_date: string;
+  product_id: number;
+  product_name: string;
+  ref?: string;
+  category_id?: number;
+  quantity: number;
+  unit_price?: string;
+  subtotal?: string;
+}
+
 export interface ProductsSoldReport {
   startDate: string;
   endDate: string;
   totalSales: number;
-  totalProducts: number;
-  items: ProductSalesSummary[];
+  totalItems: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  items: SoldProductItem[];
 }
 
 export interface TopProductsReport {
-  period: ReportPeriod;
   startDate: string;
   endDate: string;
   limit?: number;
@@ -48,20 +60,27 @@ export class ReportService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getProductsSoldReport(startDate: string, endDate: string): Observable<ProductsSoldReport> {
-    const params = new HttpParams().set('startDate', startDate).set('endDate', endDate);
+  getProductsSoldReport(
+    startDate: string,
+    endDate: string,
+    page = 1,
+    limit = 20,
+  ): Observable<ProductsSoldReport> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate)
+      .set('page', page)
+      .set('limit', limit);
 
     return this.http.get<ProductsSoldReport>(`${this.endpoint}/products`, { params });
   }
 
   getTopProductsReport(
-    period: ReportPeriod,
     startDate: string,
     endDate: string,
     limit = 10,
   ): Observable<TopProductsReport> {
     const params = new HttpParams()
-      .set('period', period)
       .set('startDate', startDate)
       .set('endDate', endDate)
       .set('limit', limit);

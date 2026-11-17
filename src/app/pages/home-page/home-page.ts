@@ -1,23 +1,29 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
-import { HomeService, HomeStats } from '../../shared/services/home-service';
+import {
+  HomeService,
+  DashboardResponse,
+  LowStockProduct,
+  TopSellingProduct,
+} from '../../shared/services/home-service';
 
 @Component({
   selector: 'app-home-page',
-  imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
 })
 export class HomePage implements OnInit {
-  stats: HomeStats = {
-    totalProducts: 0,
-    totalUsers: 0,
-    totalSales: 0,
-    lowStockProducts: 0,
+  dashboard: DashboardResponse = {
+    totalSalesToday: 0,
+    lowStockProducts: [],
+    topSellingProducts: [],
+    topSellingPeriod: { startDate: '', endDate: '' },
   };
   loading = false;
   errorMessage = '';
@@ -45,7 +51,12 @@ export class HomePage implements OnInit {
       )
       .subscribe({
         next: (response) => {
-          this.stats = this.normalizeStats(response);
+          this.dashboard = {
+            totalSalesToday: Number(response?.totalSalesToday ?? 0),
+            lowStockProducts: (response?.lowStockProducts ?? []).slice(0, 5),
+            topSellingProducts: (response?.topSellingProducts ?? []).slice(0, 5),
+            topSellingPeriod: response?.topSellingPeriod ?? { startDate: '', endDate: '' },
+          };
           this.cdr.detectChanges();
         },
         error: () => {
@@ -55,23 +66,19 @@ export class HomePage implements OnInit {
       });
   }
 
-  private normalizeStats(stats: Partial<HomeStats> | null | undefined): HomeStats {
-    const totalProducts =
-      Number(stats?.totalProducts ?? stats?.productsCount ?? stats?.products_quantity ?? 0) || 0;
-    const totalUsers =
-      Number(stats?.totalUsers ?? stats?.usersCount ?? stats?.users_quantity ?? 0) || 0;
-    const totalSales =
-      Number(stats?.totalSales ?? stats?.salesCount ?? stats?.sales_quantity ?? 0) || 0;
-    const lowStockProducts =
-      Number(
-        stats?.lowStockProducts ?? stats?.lowStockProductsCount ?? stats?.low_stock_products ?? 0,
-      ) || 0;
+  get lowStockItems(): LowStockProduct[] {
+    return this.dashboard.lowStockProducts;
+  }
 
-    return {
-      totalProducts,
-      totalUsers,
-      totalSales,
-      lowStockProducts,
-    };
+  get topSellingItems(): TopSellingProduct[] {
+    return this.dashboard.topSellingProducts;
+  }
+
+  getMaxSoldQuantity(): number {
+    return Math.max(...this.topSellingItems.map((product) => product.total_quantity), 1);
+  }
+
+  getBarWidth(product: TopSellingProduct): number {
+    return Math.max((product.total_quantity / this.getMaxSoldQuantity()) * 100, 4);
   }
 }

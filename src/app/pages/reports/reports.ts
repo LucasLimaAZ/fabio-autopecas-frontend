@@ -13,9 +13,9 @@ import { Observable } from 'rxjs';
 import {
   ProductSalesSummary,
   ProductsSoldReport,
-  ReportPeriod,
   ReportService,
   RevenueReport,
+  SoldProductItem,
   TopProductsReport,
 } from '../../shared/services/report-service';
 
@@ -23,7 +23,6 @@ type ReportType = 'products-sold' | 'top-products' | 'revenue';
 
 interface ReportFormValue {
   reportType: ReportType;
-  period: ReportPeriod;
   startDate: string;
   endDate: string;
 }
@@ -47,20 +46,13 @@ interface ReportFormValue {
 })
 export class Reports {
   readonly reportTypeOptions = [
-    { value: 'products-sold', label: 'Produtos vendidos por período' },
+    { value: 'products-sold', label: 'Todos produtos vendidos' },
     { value: 'top-products', label: 'Produtos mais vendidos' },
-    { value: 'revenue', label: 'Faturamento por período' },
+    { value: 'revenue', label: 'Faturamento' },
   ] as const;
-
-  readonly periodOptions: Array<{ value: ReportPeriod; label: string }> = [
-    { value: 'week', label: 'Semana' },
-    { value: 'month', label: 'Mês' },
-    { value: 'year', label: 'Ano' },
-  ];
 
   readonly reportForm = new FormGroup({
     reportType: new FormControl<ReportType>('products-sold', { nonNullable: true }),
-    period: new FormControl<ReportPeriod>('month', { nonNullable: true }),
     startDate: new FormControl<Date | null>(this.getDateDaysAgo(30), {
       validators: [Validators.required],
     }),
@@ -69,8 +61,12 @@ export class Reports {
     }),
   });
 
+  readonly pageSize = 20;
   loading = false;
   errorMessage = '';
+  currentPage = 1;
+  totalItems = 0;
+  totalPages = 0;
   reportData: ProductsSoldReport | TopProductsReport | RevenueReport | null = null;
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -99,7 +95,7 @@ export class Reports {
     return true;
   }
 
-  submit() {
+  submit(page = 1) {
     if (this.reportForm.invalid) {
       this.errorMessage = 'Informe as datas para consultar o relatório.';
       this.reportData = null;
@@ -124,15 +120,27 @@ export class Reports {
     this.reportData = null;
 
     const request$: Observable<ProductsSoldReport | TopProductsReport | RevenueReport> =
-      this.buildRequest({
-        ...formValue,
-        startDate: this.formatDateValue(formValue.startDate) ?? '',
-        endDate: this.formatDateValue(formValue.endDate) ?? '',
-      });
+      this.buildRequest(
+        {
+          ...formValue,
+          startDate: this.formatDateValue(formValue.startDate) ?? '',
+          endDate: this.formatDateValue(formValue.endDate) ?? '',
+        },
+        page,
+      );
 
     request$.subscribe({
       next: (response: ProductsSoldReport | TopProductsReport | RevenueReport) => {
         this.reportData = response;
+        if (this.selectedReportType === 'products-sold' && 'totalItems' in response) {
+          this.currentPage = response.page;
+          this.totalItems = response.totalItems;
+          this.totalPages = response.totalPages;
+        } else {
+          this.currentPage = 1;
+          this.totalItems = 0;
+          this.totalPages = 0;
+        }
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -156,7 +164,6 @@ export class Reports {
   resetFilters() {
     this.reportForm.reset({
       reportType: 'products-sold',
-      period: 'month',
       startDate: this.getDateDaysAgo(30),
       endDate: this.getToday(),
     });
@@ -187,15 +194,20 @@ export class Reports {
       return null;
     }
 
+    const products =
+      'totalItems' in this.reportData
+        ? Number(this.reportData.totalItems ?? 0)
+        : 'totalProducts' in this.reportData
+          ? Number(this.reportData.totalProducts ?? 0)
+          : 0;
+
     return {
       sales: Number(this.reportData.totalSales ?? 0),
-      products: Number(
-        'totalProducts' in this.reportData ? (this.reportData.totalProducts ?? 0) : 0,
-      ),
+      products,
     };
   }
 
-  getProductRows(): ProductSalesSummary[] {
+  getProductRows(): Array<ProductSalesSummary | SoldProductItem> {
     if (!this.reportData || !('items' in this.reportData)) {
       return [];
     }
@@ -203,19 +215,33 @@ export class Reports {
     return this.reportData.items ?? [];
   }
 
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.submit(this.currentPage - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.submit(this.currentPage + 1);
+    }
+  }
+
   private buildRequest(
     formValue: ReportFormValue,
+    page = 1,
   ): Observable<ProductsSoldReport | TopProductsReport | RevenueReport> {
     if (formValue.reportType === 'products-sold') {
-      return this.reportService.getProductsSoldReport(formValue.startDate, formValue.endDate);
+      return this.reportService.getProductsSoldReport(
+        formValue.startDate,
+        formValue.endDate,
+        page,
+        this.pageSize,
+      );
     }
 
     if (formValue.reportType === 'top-products') {
-      return this.reportService.getTopProductsReport(
-        formValue.period,
-        formValue.startDate,
-        formValue.endDate,
-      );
+      return this.reportService.getTopProductsReport(formValue.startDate, formValue.endDate);
     }
 
     return this.reportService.getRevenueReport(formValue.startDate, formValue.endDate);

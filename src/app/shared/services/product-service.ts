@@ -16,6 +16,7 @@ export interface CreateProductPayload {
 
 export interface Product extends CreateProductPayload {
   id: number;
+  status?: 'active' | 'archived';
   createdAt: string;
   updatedAt: string;
 }
@@ -62,7 +63,7 @@ export class ProductService {
     return this.http.patch<Product>(`${this.endpoint}/${id}`, product);
   }
 
-  deleteProduct(id: number): Observable<void> {
+  archiveProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.endpoint}/${id}`);
   }
 }

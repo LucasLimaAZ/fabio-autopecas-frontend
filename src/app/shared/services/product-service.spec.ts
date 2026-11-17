@@ -116,8 +116,8 @@ describe('ProductService', () => {
     request.flush(updatedProduct);
   });
 
-  it('should delete a product with DELETE /product/:id', () => {
-    service.deleteProduct(8).subscribe((result) => {
+  it('should archive a product with DELETE /product/:id', () => {
+    service.archiveProduct(8).subscribe((result) => {
       expect(result).toBeNull();
     });
 

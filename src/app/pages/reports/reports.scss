@@ -38,11 +38,9 @@ h2 {
   padding: 1rem;
 }
 
-.report-form {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  align-items: start;
+.flex {
+  display: flex;
+  gap: 16px;
 }
 
 .field-group {
@@ -165,6 +163,26 @@ td {
 .message--error {
   color: #b3261e;
   margin-bottom: 1rem;
+}
+
+.pagination {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.pagination span {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 @media (max-width: 40rem) {

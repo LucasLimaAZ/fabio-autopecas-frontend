@@ -18,28 +18,12 @@
     </mat-card>
   } @else {
     <div class="stats-grid">
-      <mat-card appearance="outlined" class="stat-card stat-card--products">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Produtos</span>
-          <mat-icon aria-hidden="true">inventory_2</mat-icon>
-        </div>
-        <strong class="stat-card__value">{{ stats.totalProducts }}</strong>
-      </mat-card>
-
-      <mat-card appearance="outlined" class="stat-card stat-card--users">
-        <div class="stat-card__header">
-          <span class="stat-card__label">Usuários</span>
-          <mat-icon aria-hidden="true">people</mat-icon>
-        </div>
-        <strong class="stat-card__value">{{ stats.totalUsers }}</strong>
-      </mat-card>
-
       <mat-card appearance="outlined" class="stat-card stat-card--sales">
         <div class="stat-card__header">
-          <span class="stat-card__label">Vendas</span>
+          <span class="stat-card__label">Vendas hoje</span>
           <mat-icon aria-hidden="true">sell</mat-icon>
         </div>
-        <strong class="stat-card__value">{{ stats.totalSales }}</strong>
+        <strong class="stat-card__value">{{ dashboard.totalSalesToday }}</strong>
       </mat-card>
 
       <mat-card appearance="outlined" class="stat-card stat-card--low-stock">
@@ -47,7 +31,94 @@
           <span class="stat-card__label">Estoque baixo</span>
           <mat-icon aria-hidden="true">warning</mat-icon>
         </div>
-        <strong class="stat-card__value">{{ stats.lowStockProducts }}</strong>
+        <strong class="stat-card__value">{{ dashboard.lowStockProducts.length }}</strong>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="stat-card stat-card--top">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Mais vendidos</span>
+          <mat-icon aria-hidden="true">trending_up</mat-icon>
+        </div>
+        <strong class="stat-card__value">{{ dashboard.topSellingProducts.length }}</strong>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="stat-card stat-card--period">
+        <div class="stat-card__header">
+          <span class="stat-card__label">Período analisado</span>
+          <mat-icon aria-hidden="true">calendar_month</mat-icon>
+        </div>
+        <strong class="stat-card__period">
+          {{ dashboard.topSellingPeriod.startDate | date: 'dd/MM' }}–{{
+            dashboard.topSellingPeriod.endDate | date: 'dd/MM'
+          }}
+        </strong>
+      </mat-card>
+    </div>
+
+    <div class="dashboard-grid">
+      <mat-card appearance="outlined" class="dashboard-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Reposição</p>
+            <h3>Produtos com estoque baixo</h3>
+          </div>
+          <mat-icon aria-hidden="true">inventory</mat-icon>
+        </div>
+
+        @if (lowStockItems.length === 0) {
+          <p class="empty-message">Nenhum produto com estoque baixo.</p>
+        } @else {
+          <div class="low-stock-list">
+            @for (product of lowStockItems; track product.id) {
+              <div class="low-stock-item">
+                <div class="low-stock-item__identity">
+                  <strong>{{ product.name }}</strong>
+                  <span>{{ product.ref }}</span>
+                </div>
+                <div class="stock-values">
+                  <span
+                    >Atual <strong>{{ product.amount }}</strong></span
+                  >
+                  <span
+                    >Faltam <strong>{{ product.missing_amount }}</strong></span
+                  >
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </mat-card>
+
+      <mat-card appearance="outlined" class="dashboard-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Produtos mais vendidos</p>
+            <h3>Último mês</h3>
+          </div>
+          <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        </div>
+
+        @if (topSellingItems.length === 0) {
+          <p class="empty-message">Nenhum produto vendido no período.</p>
+        } @else {
+          <div
+            class="sales-chart"
+            role="img"
+            aria-label="Quantidade comercializada dos produtos mais vendidos"
+          >
+            @for (product of topSellingItems; track product.product_id) {
+              <div class="chart-row">
+                <div class="chart-row__header">
+                  <strong>{{ product.name }}</strong>
+                  <span>{{ product.total_quantity }} vendido(s)</span>
+                </div>
+                <div class="chart-track">
+                  <div class="chart-bar" [style.width.%]="getBarWidth(product)"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </mat-card>
     </div>
   }
