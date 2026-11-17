@@ -1,0 +1,152 @@
+<section class="reports-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Dashboard</p>
+      <h2>Relatórios</h2>
+      <p class="page-description">
+        Acompanhe as vendas, produtos mais vendidos e o faturamento da loja por período.
+      </p>
+    </div>
+  </div>
+
+  <mat-card appearance="outlined" class="filters-card">
+    <form class="report-form" [formGroup]="reportForm" (ngSubmit)="submit()">
+      <div class="field-group">
+        <label for="reportType">Tipo de relatório</label>
+        <mat-form-field appearance="outline">
+          <mat-select id="reportType" formControlName="reportType">
+            @for (option of reportTypeOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (selectedReportType === 'top-products') {
+        <div class="field-group">
+          <label for="period">Período de referência</label>
+          <mat-form-field appearance="outline">
+            <mat-select id="period" formControlName="period">
+              @for (option of periodOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      }
+
+      <div class="field-group">
+        <label for="startDate">Data inicial</label>
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            id="startDate"
+            [matDatepicker]="startDatePicker"
+            formControlName="startDate"
+          />
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker" />
+          <mat-datepicker #startDatePicker />
+        </mat-form-field>
+      </div>
+
+      <div class="field-group">
+        <label for="endDate">Data final</label>
+        <mat-form-field appearance="outline">
+          <input matInput id="endDate" [matDatepicker]="endDatePicker" formControlName="endDate" />
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker" />
+          <mat-datepicker #endDatePicker />
+        </mat-form-field>
+      </div>
+
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="loading">
+          {{ loading ? 'Consultando...' : 'Gerar relatório' }}
+        </button>
+        <button matButton="outlined" type="button" (click)="resetFilters()">Limpar</button>
+      </div>
+    </form>
+  </mat-card>
+
+  @if (loading) {
+    <div class="state state--loading" aria-live="polite" aria-label="Carregando relatório">
+      <mat-spinner [diameter]="42"></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <mat-card appearance="outlined" class="state">
+      <p class="message message--error" role="alert">{{ errorMessage }}</p>
+      <button matButton="outlined" type="button" (click)="submit()">Tentar novamente</button>
+    </mat-card>
+  } @else if (reportData && !hasResults) {
+    <mat-card appearance="outlined" class="state">
+      <h3>Nenhum resultado encontrado</h3>
+      <p>Não há dados para o período selecionado.</p>
+    </mat-card>
+  } @else if (reportData) {
+    <div class="results">
+      <div class="summary-row">
+        @if (selectedReportType === 'revenue' && getRevenueSummary(); as revenueSummary) {
+          <mat-card appearance="outlined" class="summary-card">
+            <p class="label">Total de vendas</p>
+            <strong>{{ revenueSummary.sales }}</strong>
+          </mat-card>
+          <mat-card appearance="outlined" class="summary-card summary-card--accent">
+            <p class="label">Faturamento total</p>
+            <strong>{{ revenueSummary.revenue }}</strong>
+          </mat-card>
+        } @else if (getSummaryMetrics(); as summary) {
+          <mat-card appearance="outlined" class="summary-card">
+            <p class="label">Vendas no período</p>
+            <strong>{{ summary.sales }}</strong>
+          </mat-card>
+          <mat-card appearance="outlined" class="summary-card summary-card--accent">
+            <p class="label">Produtos envolvidos</p>
+            <strong>{{ summary.products }}</strong>
+          </mat-card>
+        }
+      </div>
+
+      @if (selectedReportType !== 'revenue' && getProductRows().length > 0) {
+        <mat-card appearance="outlined" class="table-card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Produto</th>
+                  <th scope="col">Referência</th>
+                  <th scope="col">Quantidade</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Preço médio</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of getProductRows(); track item.product_id) {
+                  <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.ref }}</td>
+                    <td>{{ item.total_quantity }}</td>
+                    <td>{{ formatCurrency(item.total_amount) }}</td>
+                    <td>{{ formatCurrency(item.average_unit_price ?? 0) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card>
+      }
+
+      @if (selectedReportType === 'revenue' && reportData && 'totalRevenue' in reportData) {
+        <mat-card appearance="outlined" class="revenue-card">
+          <h3>{{ currentReportLabel }}</h3>
+          <p>
+            Período: {{ reportForm.get('startDate')?.value | date: 'dd/MM/yyyy' }} até
+            {{ reportForm.get('endDate')?.value | date: 'dd/MM/yyyy' }}
+          </p>
+          <div class="revenue-total">
+            <span>Faturamento total</span>
+            <strong>{{ formatCurrency(reportData.totalRevenue) }}</strong>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</section>

@@ -9,6 +9,7 @@ import { Categories } from './pages/categories/categories';
 import { NewSale } from './pages/sales/new-sale';
 import { SaleDetail } from './pages/sales/sale-detail';
 import { Sales } from './pages/sales/sales';
+import { Reports } from './pages/reports/reports';
 
 export const routes: Routes = [
   {
@@ -51,6 +52,10 @@ export const routes: Routes = [
       {
         path: 'sales/:id',
         component: SaleDetail,
+      },
+      {
+        path: 'reports',
+        component: Reports,
       },
     ],
   },

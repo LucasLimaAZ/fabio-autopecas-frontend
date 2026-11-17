@@ -10,6 +10,8 @@ import {
 } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -42,6 +44,8 @@ interface SaleItemRow {
     CurrencyPipe,
     MatAutocompleteModule,
     MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -54,8 +58,7 @@ interface SaleItemRow {
 })
 export class NewSale implements OnInit {
   readonly saleForm = new FormGroup({
-    sale_date: new FormControl(this.getTodayDate(), {
-      nonNullable: true,
+    sale_date: new FormControl<Date | null>(this.getTodayDate(), {
       validators: [Validators.required],
     }),
     notes: new FormControl('', { nonNullable: true }),
@@ -149,7 +152,9 @@ export class NewSale implements OnInit {
       return;
     }
 
-    const selectedProduct = this.filteredProducts.find((product) => product.id === selectedProductId);
+    const selectedProduct = this.filteredProducts.find(
+      (product) => product.id === selectedProductId,
+    );
 
     if (!selectedProduct) {
       this.errorMessage = 'Selecione um produto válido para adicionar.';
@@ -242,7 +247,7 @@ export class NewSale implements OnInit {
     this.loading = true;
     const formValue = this.saleForm.getRawValue();
     const payload: CreateSalePayload = {
-      sale_date: formValue.sale_date || this.getTodayDate(),
+      sale_date: this.formatDateValue(formValue.sale_date) || this.getTodayDateString(),
       notes: formValue.notes?.trim() || null,
       items: this.saleItems.map((item) => ({
         product_id: item.product_id,
@@ -274,10 +279,22 @@ export class NewSale implements OnInit {
       });
   }
 
-  private getTodayDate(): string {
-    const today = new Date();
-    const offset = today.getTimezoneOffset();
-    const localDate = new Date(today.getTime() - offset * 60 * 1000);
-    return localDate.toISOString().slice(0, 10);
+  private getTodayDate(): Date {
+    return new Date();
+  }
+
+  private getTodayDateString(): string {
+    return this.formatDateValue(new Date()) ?? new Date().toISOString().slice(0, 10);
+  }
+
+  private formatDateValue(value: Date | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+    const offset = date.getTimezoneOffset();
+    const normalized = new Date(date.getTime() - offset * 60 * 1000);
+    return normalized.toISOString().slice(0, 10);
   }
 }

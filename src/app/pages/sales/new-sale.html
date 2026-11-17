@@ -9,7 +9,9 @@
     <div class="sale-form">
       <mat-form-field appearance="outline">
         <mat-label>Data da venda</mat-label>
-        <input matInput formControlName="sale_date" type="date" />
+        <input matInput [matDatepicker]="saleDatePicker" formControlName="sale_date" />
+        <mat-datepicker-toggle matSuffix [for]="saleDatePicker" />
+        <mat-datepicker #saleDatePicker />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -96,12 +98,7 @@
                 </td>
                 <td>{{ calculateItemSubtotal(item) | currency: 'BRL' }}</td>
                 <td>
-                  <button
-                    mat-stroked-button
-                    color="warn"
-                    type="button"
-                    (click)="removeItem(index)"
-                  >
+                  <button mat-stroked-button color="warn" type="button" (click)="removeItem(index)">
                     Remover
                   </button>
                 </td>
@@ -120,11 +117,7 @@
     </div>
 
     <div class="actions">
-      <button
-        matButton="filled"
-        type="submit"
-        [disabled]="loading || saleItems.length === 0"
-      >
+      <button matButton="filled" type="submit" [disabled]="loading || saleItems.length === 0">
         @if (loading) {
           <mat-spinner [diameter]="20"></mat-spinner>
         } @else {
