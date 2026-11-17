@@ -1,25 +1,52 @@
 .new-sale-page {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
+  margin: 0 auto;
+  max-width: 78rem;
 }
 
-.new-sale-card {
-  width: min(100%, 1000px);
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+}
+
+h2,
+p {
+  margin-top: 0;
+}
+
+h2 {
+  color: #172554;
+  font-size: 2rem;
+  margin-bottom: 0.35rem;
+}
+
+.page-description {
+  color: #64748b;
+  margin-bottom: 0;
+}
+
+form {
+  width: 100%;
 }
 
 .sale-form {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 1.5rem;
 }
 
 .add-item {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) 180px auto;
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 1.5rem;
 }
 
@@ -31,8 +58,9 @@
   width: 100%;
 }
 
-.notes-field {
-  min-width: 0;
+.add-item button {
+  align-self: center;
+  justify-self: start;
 }
 
 .items-table-wrapper {
@@ -61,6 +89,33 @@
   padding: 0.5rem 0.75rem;
 }
 
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  gap: 0.75rem;
+}
+
+mat-spinner {
+  display: inline-block;
+}
+
+.message {
+  margin: 0.5rem 0;
+}
+
+.message--error {
+  color: #b3261e;
+}
+
+.message--success {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 6px;
+  color: #1b5e20;
+  padding: 0.75rem 1rem;
+}
+
 .sale-summary {
   display: flex;
   justify-content: flex-end;
@@ -70,33 +125,26 @@
   font-size: 1.125rem;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
-
-.message {
-  margin-bottom: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-}
-
-.message--error {
-  background: #fdecea;
-  color: #b3261e;
-}
-
-.message--success {
-  background: #e6f4ea;
-  color: #1b5e20;
-}
-
 .empty-state {
   padding: 1rem;
   border: 1px dashed rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   color: rgba(0, 0, 0, 0.7);
   margin-bottom: 1.5rem;
+}
+
+@media (max-width: 40rem) {
+  .sale-form,
+  .add-item {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }

@@ -1,7 +1,12 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -15,7 +20,6 @@ import { CreateProductPayload, ProductService } from '../../shared/services/prod
   selector: 'app-new-product',
   imports: [
     MatButtonModule,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -51,6 +55,7 @@ export class NewProduct implements OnInit {
   isEditMode = false;
   productId: number | null = null;
   categories: Category[] = [];
+  @ViewChild(FormGroupDirective) private formDirective?: FormGroupDirective;
 
   constructor(
     private readonly productService: ProductService,
@@ -188,7 +193,7 @@ export class NewProduct implements OnInit {
   }
 
   private resetForm() {
-    this.productForm.reset({
+    const initialValues = {
       name: '',
       ref: '',
       notes: '',
@@ -197,6 +202,13 @@ export class NewProduct implements OnInit {
       amount: 0,
       minimum_amount: 0,
       category_id: null,
-    });
+    };
+
+    if (this.formDirective) {
+      this.formDirective.resetForm(initialValues);
+      return;
+    }
+
+    this.productForm.reset(initialValues);
   }
 }

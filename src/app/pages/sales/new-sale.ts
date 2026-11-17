@@ -10,13 +10,22 @@ import {
 } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { Product, ProductService } from '../../shared/services/product-service';
 import { CreateSalePayload, SaleService } from '../../shared/services/sale-service';
 
@@ -33,7 +42,6 @@ interface SaleItemRow {
     CurrencyPipe,
     MatAutocompleteModule,
     MatButtonModule,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -63,12 +71,12 @@ export class NewSale implements OnInit {
     }),
   });
 
-  readonly productSearchControl = new FormControl('', { nonNullable: true });
+  readonly productSearchControl = new FormControl<string | Product>('', { nonNullable: true });
 
-  availableProducts: Product[] = [];
   filteredProducts: Product[] = [];
   saleItems: SaleItemRow[] = [];
   selectedProductId: number | null = null;
+  productSearchLoading = false;
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -82,17 +90,42 @@ export class NewSale implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadProducts();
-
     this.productSearchControl.valueChanges
-      .pipe(debounceTime(250), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe((value) => {
-        const term = typeof value === 'string' ? value.trim().toLowerCase() : '';
-        this.filteredProducts = this.filterProducts(this.availableProducts, term);
-
-        if (!term && this.addItemForm.get('product_id')?.value) {
+      .pipe(
+        filter((value): value is string => typeof value === 'string'),
+        tap(() => {
+          this.selectedProductId = null;
           this.addItemForm.patchValue({ product_id: null });
-        }
+        }),
+        map((value) => value.trim()),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          this.errorMessage = '';
+
+          if (!term) {
+            this.filteredProducts = [];
+            return of<Product[]>([]);
+          }
+
+          this.productSearchLoading = true;
+          this.filteredProducts = [];
+
+          return this.productService.searchProducts(term).pipe(
+            catchError(() => {
+              this.errorMessage = 'Não foi possível buscar os produtos. Tente novamente.';
+              return of<Product[]>([]);
+            }),
+            finalize(() => {
+              this.productSearchLoading = false;
+              this.cdr.detectChanges();
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((products) => {
+        this.filteredProducts = products;
       });
   }
 
@@ -116,9 +149,7 @@ export class NewSale implements OnInit {
       return;
     }
 
-    const selectedProduct = this.availableProducts.find(
-      (product) => product.id === selectedProductId,
-    );
+    const selectedProduct = this.filteredProducts.find((product) => product.id === selectedProductId);
 
     if (!selectedProduct) {
       this.errorMessage = 'Selecione um produto válido para adicionar.';
@@ -141,7 +172,7 @@ export class NewSale implements OnInit {
     });
     this.selectedProductId = null;
     this.productSearchControl.setValue('');
-    this.filteredProducts = this.availableProducts;
+    this.filteredProducts = [];
   }
 
   selectProduct(product: Product | null) {
@@ -156,7 +187,11 @@ export class NewSale implements OnInit {
     this.productSearchControl.setValue(product.name, { emitEvent: false });
   }
 
-  displayProductName(product: Product | null): string {
+  displayProductName(product: Product | string | null): string {
+    if (typeof product === 'string') {
+      return product;
+    }
+
     return product ? product.name : '';
   }
 
@@ -237,45 +272,6 @@ export class NewSale implements OnInit {
           this.errorMessage = 'Não foi possível registrar a venda. Tente novamente.';
         },
       });
-  }
-
-  private loadProducts() {
-    this.loading = true;
-    this.errorMessage = '';
-
-    this.productService
-      .getProducts(1, 100)
-      .pipe(
-        finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }),
-      )
-      .subscribe({
-        next: ({ products }) => {
-          this.availableProducts = products;
-          this.filteredProducts = this.filterProducts(products);
-        },
-        error: () => {
-          this.errorMessage = 'Não foi possível carregar os produtos para a venda.';
-          this.availableProducts = [];
-          this.filteredProducts = [];
-        },
-      });
-  }
-
-  private filterProducts(
-    products: Product[],
-    term = this.productSearchControl.value.trim().toLowerCase(),
-  ) {
-    if (!term) {
-      return products;
-    }
-
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(term) || product.ref.toLowerCase().includes(term),
-    );
   }
 
   private getTodayDate(): string {

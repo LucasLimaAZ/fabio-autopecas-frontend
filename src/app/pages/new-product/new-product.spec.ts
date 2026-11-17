@@ -60,4 +60,27 @@ describe('NewProduct', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should clear validation errors after a successful creation', () => {
+    fixture.detectChanges();
+    component.productForm.setValue({
+      name: 'Produto',
+      ref: 'REF-1',
+      notes: '',
+      cost_price: null,
+      sale_price: null,
+      amount: 0,
+      minimum_amount: 0,
+      category_id: 1,
+    });
+
+    const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(component.successMessage).toBe('Produto cadastrado com sucesso.');
+    expect(component.productForm.pristine).toBeTrue();
+    expect(component.productForm.untouched).toBeTrue();
+    expect(fixture.nativeElement.querySelectorAll('mat-error').length).toBe(0);
+  });
 });
