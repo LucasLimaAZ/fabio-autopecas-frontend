@@ -7,6 +7,8 @@ import { NewProduct } from './pages/new-product/new-product';
 import { Products } from './pages/products/products';
 import { Categories } from './pages/categories/categories';
 import { NewSale } from './pages/sales/new-sale';
+import { SaleDetail } from './pages/sales/sale-detail';
+import { Sales } from './pages/sales/sales';
 
 export const routes: Routes = [
   {
@@ -39,8 +41,16 @@ export const routes: Routes = [
         component: Categories,
       },
       {
+        path: 'sales',
+        component: Sales,
+      },
+      {
         path: 'sales/new',
         component: NewSale,
+      },
+      {
+        path: 'sales/:id',
+        component: SaleDetail,
       },
     ],
   },
