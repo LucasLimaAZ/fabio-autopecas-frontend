@@ -11,6 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable } from 'rxjs';
 import {
+  LowStockItem,
+  LowStockReport,
   ProductSalesSummary,
   ProductsSoldReport,
   ReportService,
@@ -19,7 +21,7 @@ import {
   TopProductsReport,
 } from '../../shared/services/report-service';
 
-type ReportType = 'products-sold' | 'top-products' | 'revenue';
+type ReportType = 'products-sold' | 'top-products' | 'revenue' | 'low-stock';
 
 interface ReportFormValue {
   reportType: ReportType;
@@ -49,6 +51,7 @@ export class Reports {
     { value: 'products-sold', label: 'Todos produtos vendidos' },
     { value: 'top-products', label: 'Produtos mais vendidos' },
     { value: 'revenue', label: 'Faturamento' },
+    { value: 'low-stock', label: 'Produtos com estoque baixo' },
   ] as const;
 
   readonly reportForm = new FormGroup({
@@ -67,7 +70,7 @@ export class Reports {
   currentPage = 1;
   totalItems = 0;
   totalPages = 0;
-  reportData: ProductsSoldReport | TopProductsReport | RevenueReport | null = null;
+  reportData: ProductsSoldReport | TopProductsReport | RevenueReport | LowStockReport | null = null;
   private readonly cdr = inject(ChangeDetectorRef);
 
   constructor(private readonly reportService: ReportService) {}
@@ -96,41 +99,45 @@ export class Reports {
   }
 
   submit(page = 1) {
-    if (this.reportForm.invalid) {
-      this.errorMessage = 'Informe as datas para consultar o relatório.';
-      this.reportData = null;
-      return;
-    }
-
     const formValue = this.reportForm.getRawValue();
-    if (!formValue.startDate || !formValue.endDate) {
-      this.errorMessage = 'Informe as datas para consultar o relatório.';
-      this.reportData = null;
-      return;
-    }
 
-    if (formValue.startDate > formValue.endDate) {
-      this.errorMessage = 'A data inicial não pode ser maior que a data final.';
-      this.reportData = null;
-      return;
+    if (formValue.reportType !== 'low-stock') {
+      if (this.reportForm.invalid) {
+        this.errorMessage = 'Informe as datas para consultar o relatório.';
+        this.reportData = null;
+        return;
+      }
+
+      if (!formValue.startDate || !formValue.endDate) {
+        this.errorMessage = 'Informe as datas para consultar o relatório.';
+        this.reportData = null;
+        return;
+      }
+
+      if (formValue.startDate > formValue.endDate) {
+        this.errorMessage = 'A data inicial não pode ser maior que a data final.';
+        this.reportData = null;
+        return;
+      }
     }
 
     this.loading = true;
     this.errorMessage = '';
     this.reportData = null;
 
-    const request$: Observable<ProductsSoldReport | TopProductsReport | RevenueReport> =
-      this.buildRequest(
-        {
-          ...formValue,
-          startDate: this.formatDateValue(formValue.startDate) ?? '',
-          endDate: this.formatDateValue(formValue.endDate) ?? '',
-        },
-        page,
-      );
+    const request$: Observable<
+      ProductsSoldReport | TopProductsReport | RevenueReport | LowStockReport
+    > = this.buildRequest(
+      {
+        ...formValue,
+        startDate: this.formatDateValue(formValue.startDate) ?? '',
+        endDate: this.formatDateValue(formValue.endDate) ?? '',
+      },
+      page,
+    );
 
     request$.subscribe({
-      next: (response: ProductsSoldReport | TopProductsReport | RevenueReport) => {
+      next: (response: ProductsSoldReport | TopProductsReport | RevenueReport | LowStockReport) => {
         this.reportData = response;
         if (this.selectedReportType === 'products-sold' && 'totalItems' in response) {
           this.currentPage = response.page;
@@ -207,7 +214,15 @@ export class Reports {
     };
   }
 
-  getProductRows(): Array<ProductSalesSummary | SoldProductItem> {
+  getLowStockSummary(): number | null {
+    if (!this.reportData || !('totalProducts' in this.reportData)) {
+      return null;
+    }
+
+    return Number(this.reportData.totalProducts ?? 0);
+  }
+
+  getProductRows(): Array<ProductSalesSummary | SoldProductItem | LowStockItem> {
     if (!this.reportData || !('items' in this.reportData)) {
       return [];
     }
@@ -230,7 +245,7 @@ export class Reports {
   private buildRequest(
     formValue: ReportFormValue,
     page = 1,
-  ): Observable<ProductsSoldReport | TopProductsReport | RevenueReport> {
+  ): Observable<ProductsSoldReport | TopProductsReport | RevenueReport | LowStockReport> {
     if (formValue.reportType === 'products-sold') {
       return this.reportService.getProductsSoldReport(
         formValue.startDate,
@@ -242,6 +257,10 @@ export class Reports {
 
     if (formValue.reportType === 'top-products') {
       return this.reportService.getTopProductsReport(formValue.startDate, formValue.endDate);
+    }
+
+    if (formValue.reportType === 'low-stock') {
+      return this.reportService.getLowStockReport();
     }
 
     return this.reportService.getRevenueReport(formValue.startDate, formValue.endDate);

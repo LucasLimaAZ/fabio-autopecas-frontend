@@ -52,6 +52,22 @@ export interface RevenueReport {
   totalRevenue: string | number;
 }
 
+export interface LowStockItem {
+  id: number;
+  name: string;
+  ref: string;
+  category_id?: number;
+  amount: number;
+  minimum_amount: number;
+  missing_amount: number;
+  sale_price: string | number;
+}
+
+export interface LowStockReport {
+  totalProducts: number;
+  items: LowStockItem[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -92,5 +108,9 @@ export class ReportService {
     const params = new HttpParams().set('startDate', startDate).set('endDate', endDate);
 
     return this.http.get<RevenueReport>(`${this.endpoint}/revenue`, { params });
+  }
+
+  getLowStockReport(): Observable<LowStockReport> {
+    return this.http.get<LowStockReport>(`${this.endpoint}/low-stock`);
   }
 }

@@ -92,6 +92,32 @@ describe('ReportService', () => {
     request.flush(response);
   });
 
+  it('should request the low stock report', () => {
+    const response = {
+      totalProducts: 1,
+      items: [
+        {
+          id: 10,
+          name: 'Filtro de Óleo',
+          ref: 'FLT-001',
+          category_id: 2,
+          amount: 3,
+          minimum_amount: 10,
+          missing_amount: 7,
+          sale_price: '39.90',
+        },
+      ],
+    };
+
+    service.getLowStockReport().subscribe((result) => {
+      expect(result).toEqual(response);
+    });
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/sale/report/low-stock`);
+    expect(request.request.method).toBe('GET');
+    request.flush(response);
+  });
+
   it('should request the revenue report', () => {
     const response = {
       startDate: '2026-11-01',

@@ -22,35 +22,37 @@
         </mat-form-field>
       </div>
 
-      <div class="flex">
-        <div class="field-group">
-          <label for="startDate">Data inicial</label>
-          <mat-form-field appearance="outline">
-            <input
-              matInput
-              id="startDate"
-              [matDatepicker]="startDatePicker"
-              formControlName="startDate"
-            />
-            <mat-datepicker-toggle matSuffix [for]="startDatePicker" />
-            <mat-datepicker #startDatePicker />
-          </mat-form-field>
-        </div>
+      @if (selectedReportType !== 'low-stock') {
+        <div class="flex">
+          <div class="field-group">
+            <label for="startDate">Data inicial</label>
+            <mat-form-field appearance="outline">
+              <input
+                matInput
+                id="startDate"
+                [matDatepicker]="startDatePicker"
+                formControlName="startDate"
+              />
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker" />
+              <mat-datepicker #startDatePicker />
+            </mat-form-field>
+          </div>
 
-        <div class="field-group">
-          <label for="endDate">Data final</label>
-          <mat-form-field appearance="outline">
-            <input
-              matInput
-              id="endDate"
-              [matDatepicker]="endDatePicker"
-              formControlName="endDate"
-            />
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker" />
-            <mat-datepicker #endDatePicker />
-          </mat-form-field>
+          <div class="field-group">
+            <label for="endDate">Data final</label>
+            <mat-form-field appearance="outline">
+              <input
+                matInput
+                id="endDate"
+                [matDatepicker]="endDatePicker"
+                formControlName="endDate"
+              />
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker" />
+              <mat-datepicker #endDatePicker />
+            </mat-form-field>
+          </div>
         </div>
-      </div>
+      }
 
       <div class="actions">
         <button matButton="filled" type="submit" [disabled]="loading">
@@ -78,7 +80,12 @@
   } @else if (reportData) {
     <div class="results">
       <div class="summary-row">
-        @if (selectedReportType === 'revenue' && getRevenueSummary(); as revenueSummary) {
+        @if (selectedReportType === 'low-stock' && getLowStockSummary(); as lowStockTotal) {
+          <mat-card appearance="outlined" class="summary-card summary-card--accent">
+            <p class="label">Produtos com estoque baixo</p>
+            <strong>{{ lowStockTotal }}</strong>
+          </mat-card>
+        } @else if (selectedReportType === 'revenue' && getRevenueSummary(); as revenueSummary) {
           <mat-card appearance="outlined" class="summary-card">
             <p class="label">Total de vendas</p>
             <strong>{{ revenueSummary.sales }}</strong>
@@ -130,6 +137,31 @@
                     }
                   }
                 </tbody>
+              } @else if (selectedReportType === 'low-stock') {
+                <thead>
+                  <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Referência</th>
+                    <th scope="col">Estoque atual</th>
+                    <th scope="col">Estoque mínimo</th>
+                    <th scope="col">Quantidade faltante</th>
+                    <th scope="col">Preço</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of getProductRows(); track $index) {
+                    @if ('missing_amount' in item) {
+                      <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.ref || '-' }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.minimum_amount }}</td>
+                        <td>{{ item.missing_amount }}</td>
+                        <td>{{ formatCurrency(item.sale_price) }}</td>
+                      </tr>
+                    }
+                  }
+                </tbody>
               } @else {
                 <thead>
                   <tr>
@@ -141,7 +173,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (item of getProductRows(); track item.product_id) {
+                  @for (item of getProductRows(); track $index) {
                     @if ('total_quantity' in item) {
                       <tr>
                         <td>{{ item.product_name }}</td>
